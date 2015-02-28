@@ -1,7 +1,7 @@
 Twitter Sentiment Analysis
 ==========================
 
-Retrieve Tweets using Spark Streaming,    
+Retrieve tweets using Spark Streaming,    
 language detection & sentiment analysis (StanfordNLP),    
 live dashboard using Kibana.
 
