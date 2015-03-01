@@ -13,11 +13,19 @@ Launch:
     mvn -DskipTests clean package
     
     cd ..
-    
-    sbt package
+
+    curl -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.4.4.tar.gz
+    tar xvzf elasticsearch-1.4.4.zip
+    cd elasticsearch-1.4.4
+    bin/plugin -install mobz/elasticsearch-head
+    bin/elasticsearch -d
+
+    cd ..
+
+    JAVA_OPTS=-Xmx2G sbt assembly
 
     ../spark-1.2.1/bin/spark-submit \
-    --class com.github.vspiewak.spark.TwitterSentimentAnalysis \
+    --class com.github.vspiewak.TwitterSentimentAnalysis \
     --master local[2] \
     target/scala-2.10/TwitterSentimentAnalysis-assembly-1.0.jar \
     <consumer_key> \
