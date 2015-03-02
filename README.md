@@ -22,6 +22,16 @@ Launch:
 
     cd ..
 
+    chmod a+x insert.dashboard.sh
+    ./insert.dashboard.sh
+
+    curl -O https://download.elasticsearch.org/kibana/kibana/kibana-4.0.0-darwin-x64.tar.gz
+    tar xvzf kibana-4.0.0-darwin-x64.tar.gz
+    cd kibana-4.0.0-darwin-x64
+    bin/kibana
+
+    cd ..
+
     JAVA_OPTS=-Xmx2G sbt assembly
 
     ../spark-1.1.0/bin/spark-submit \
