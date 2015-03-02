@@ -1,10 +1,14 @@
 package com.github.vspiewak
 
 import com.cybozu.labs.langdetect.DetectorFactory
-import com.github.vspiewak.util.{LogUtils, SentimentAnalysisUtils}
+import com.github.vspiewak.util.LogUtils
+import com.github.vspiewak.util.SentimentAnalysisUtils._
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming.twitter._
 import org.apache.spark.streaming.{Seconds, StreamingContext}
+import org.elasticsearch.spark._
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkContext._
 
 import scala.util.Try
 
@@ -34,21 +38,22 @@ object TwitterSentimentAnalysis {
 
      val sparkConf = new SparkConf().setAppName("TwitterSentimentAnalysis")
 
-     val ssc = new StreamingContext(sparkConf, Seconds(2))
+     val ssc = new StreamingContext(sparkConf, Seconds(1))
 
-     TwitterUtils.createStream(ssc, None, filters).foreachRDD(tweets => {
-       tweets.foreach(t => {
-         val language = detectLanguage(t.getText)
-         if(language.equals("en")) {
-           println(
-             "Tweet from: (" + t.getUser.getScreenName + ")" +
-             " Language: " + language + " " +
-             " Sentiment: " + SentimentAnalysisUtils.detect(t.getText) +
-             " Text: " + t.getText + "\n\n"
-           )
-         }
-       })
-     })
+     val tweets = TwitterUtils.createStream(ssc, None, filters)
+
+     tweets.print()
+
+     tweets.foreachRDD{(rdd, time) =>
+       rdd.map(t => {
+         Map(
+           "user"-> t.getUser.getScreenName,
+           "text" -> t.getText,
+           "language" -> detectLanguage(t.getText),
+           "sentiment" -> detectSentiment(t.getText).toString
+         )
+       }).saveToEs("twitter/tweet")
+     }
 
      ssc.start()
      ssc.awaitTermination()

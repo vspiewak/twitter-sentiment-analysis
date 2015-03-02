@@ -7,10 +7,10 @@ live dashboard using Kibana.
 
 Launch:
 
-    curl -O http://mir2.ovh.net/ftp.apache.org/dist/spark/spark-1.2.1/spark-1.2.1.tgz
-    tar xvzf spark-1.2.1.tgz
-    cd spark-1.2.1
-    mvn -DskipTests clean package
+    curl -O http://mir2.ovh.net/ftp.apache.org/dist/spark/spark-1.1.0/spark-1.1.0.tgz
+    tar xvzf spark-1.1.0.tgz
+    cd spark-1.1.0
+    ./sbt/sbt assembly
     
     cd ..
 
@@ -24,7 +24,7 @@ Launch:
 
     JAVA_OPTS=-Xmx2G sbt assembly
 
-    ../spark-1.2.1/bin/spark-submit \
+    ../spark-1.1.0/bin/spark-submit \
     --class com.github.vspiewak.TwitterSentimentAnalysis \
     --master local[2] \
     target/scala-2.10/TwitterSentimentAnalysis-assembly-1.0.jar \
