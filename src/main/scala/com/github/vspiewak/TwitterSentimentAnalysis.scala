@@ -1,5 +1,7 @@
 package com.github.vspiewak
 
+import java.time.format.DateTimeFormatter
+
 import com.cybozu.labs.langdetect.DetectorFactory
 import com.github.vspiewak.util.LogUtils
 import com.github.vspiewak.util.SentimentAnalysisUtils._
@@ -48,7 +50,11 @@ object TwitterSentimentAnalysis {
        rdd.map(t => {
          Map(
            "user"-> t.getUser.getScreenName,
+           "created_at" -> t.getCreatedAt.toInstant.toString,
+           "location" -> Option(t.getGeoLocation).map(geo => { s"${geo.getLatitude},${geo.getLongitude}" }),
            "text" -> t.getText,
+           "hashtags" -> t.getHashtagEntities.map(_.getText),
+           "retweet" -> t.getRetweetCount,
            "language" -> detectLanguage(t.getText),
            "sentiment" -> detectSentiment(t.getText).toString
          )
