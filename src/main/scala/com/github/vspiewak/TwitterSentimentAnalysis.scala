@@ -66,7 +66,7 @@ object TwitterSentimentAnalysis {
       val detector = DetectorFactory.create()
       detector.append(text)
       detector.detect()
-    }.getOrElse("")
+    }.getOrElse("unknown")
 
   }
 
