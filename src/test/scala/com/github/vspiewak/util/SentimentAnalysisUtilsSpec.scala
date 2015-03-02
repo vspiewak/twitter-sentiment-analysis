@@ -23,31 +23,31 @@ class SentimentAnalysisUtilsSpec extends FunSpec with ShouldMatchers {
 
     it("should detect not understoood sentiment") {
 
-      detect("") should equal (NOT_UNDERSTOOD)
+      detectSentiment("") should equal (NOT_UNDERSTOOD)
 
     }
 
     it("should detect a negative sentiment") {
 
-      detect("I am feeling very sad and frustrated.") should equal (NEGATIVE)
+      detectSentiment("I am feeling very sad and frustrated.") should equal (NEGATIVE)
 
     }
 
     it("should detect a neutral sentiment") {
 
-      detect("I'm watching a movie") should equal (NEUTRAL)
+      detectSentiment("I'm watching a movie") should equal (NEUTRAL)
 
     }
 
     it("should detect a positive sentiment") {
 
-      detect("It was a nice experience.") should equal (POSITIVE)
+      detectSentiment("It was a nice experience.") should equal (POSITIVE)
 
     }
 
     it("should detect a very positive sentiment") {
 
-      detect("It was a very nice experience.") should equal (VERY_POSITIVE)
+      detectSentiment("It was a very nice experience.") should equal (VERY_POSITIVE)
 
     }
 
@@ -60,7 +60,7 @@ class SentimentAnalysisUtilsSpec extends FunSpec with ShouldMatchers {
 
     it("should detect a negative sentiment on a full review") {
 
-      detect(
+      detectSentiment(
         """
           |This movie doesn't care about cleverness, wit or any other kind of intelligent humor.
           |Those who find ugly meanings in beautiful things are corrupt without being charming.
