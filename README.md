@@ -7,7 +7,7 @@ live dashboard using Kibana.
 
 Launch:
 
-    curl -O http://mir2.ovh.net/ftp.apache.org/dist/spark/spark-1.1.0/spark-1.1.0.tgz
+    curl -O http://mir2.ovh.net/ftp.apache.org/dist/spark/spark-1.1.0/spark-1.1.0.tgz"
     tar xvzf spark-1.1.0.tgz
     cd spark-1.1.0
     ./sbt/sbt assembly
@@ -21,7 +21,6 @@ Launch:
     bin/elasticsearch -d
 
     cd ..
-
     chmod a+x insert.dashboard.sh
     ./insert.dashboard.sh
 
@@ -37,7 +36,7 @@ Launch:
     ../spark-1.1.0/bin/spark-submit \
     --class com.github.vspiewak.TwitterSentimentAnalysis \
     --master local[2] \
-    target/scala-2.10/TwitterSentimentAnalysis-assembly-1.0.jar \
+    target/scala-2.10/twitter-sentiment-analysis-assembly-0.1-SNAPSHOT.jar \
     <consumer_key> \
     <consumer_secret> \
     <access_token> \
