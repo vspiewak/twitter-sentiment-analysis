@@ -26,93 +26,92 @@ import scala.util.Try
 
 object TwitterSentimentAnalysis {
 
-     def main(args: Array[String]) {
+   def main(args: Array[String]) {
 
-            if (args.length < 4) {
-                     System.err.println("Usage: TwitterSentimentAnalysis <consumer key> <consumer secret> " +
-                                "<access token> <access token secret> [<filters>]")
-                                     System.exit(1)
-                                          }
+     if (args.length < 4) {
+       System.err.println("Usage: TwitterSentimentAnalysis <consumer key> <consumer secret> " +
+         "<access token> <access token secret> [<filters>]")
+       System.exit(1)
+     }
 
-                                               LogUtils.setStreamingLogLevels()
+     LogUtils.setStreamingLogLevels()
 
-                                                    DetectorFactory.loadProfile("src/main/resources/profiles")
+     DetectorFactory.loadProfile("src/main/resources/profiles")
 
-                                                         val Array(consumerKey, consumerSecret, accessToken, accessTokenSecret) = args.take(4)
-                                                                val filters = args.takeRight(args.length - 4)
+     val Array(consumerKey, consumerSecret, accessToken, accessTokenSecret) = args.take(4)
+     val filters = args.takeRight(args.length - 4)
 
-                                                                     // Set the system properties so that Twitter4j library used by twitter stream
-                                                                        // can use them to generate OAuth credentials
-                                                                             System.setProperty("twitter4j.oauth.consumerKey", consumerKey)
-                                                                                  System.setProperty("twitter4j.oauth.consumerSecret", consumerSecret)
-                                                                                       System.setProperty("twitter4j.oauth.accessToken", accessToken)
-                                                                                            System.setProperty("twitter4j.oauth.accessTokenSecret", accessTokenSecret)
+     // Set the system properties so that Twitter4j library used by twitter stream
+     // can use them to generate OAuth credentials
+     System.setProperty("twitter4j.oauth.consumerKey", consumerKey)
+     System.setProperty("twitter4j.oauth.consumerSecret", consumerSecret)
+     System.setProperty("twitter4j.oauth.accessToken", accessToken)
+     System.setProperty("twitter4j.oauth.accessTokenSecret", accessTokenSecret)
 
-                                                                                                 val sparkConf = new SparkConf().setAppName("TwitterSentimentAnalysis")
+     val sparkConf = new SparkConf().setAppName("TwitterSentimentAnalysis")
 
-                                                                                                        val ssc = new StreamingContext(sparkConf, Seconds(1))
+     val ssc = new StreamingContext(sparkConf, Seconds(1))
 
-                                                                                                             val tweets = TwitterUtils.createStream(ssc, None, filters)
+     val tweets = TwitterUtils.createStream(ssc, None, filters)
 
-                                                                                                                  tweets.print()
+     tweets.print()
 
-                                                                                                                    //set JobConfiguration variables for writing to HBase
-                                                                                                                        val tableName = "twitter_sentiment"
-                                                                                                                            val cfNameBytes = Bytes.toBytes("TwitterSentiment")
+    //set JobConfiguration variables for writing to HBase
+    val tableName = "twitter_sentiment"
+    val cfNameBytes = Bytes.toBytes("TwitterSentiment")
 
-                                                                                                                                  val conf = HBaseConfiguration.create()
-                                                                                                                                      val jobConfig: JobConf = new JobConf(conf, this.getClass)
-                                                                                                                                          jobConfig.set("mapreduce.output.fileoutputformat.outputdir", "/user/user01/out")
-                                                                                                                                            jobConfig.setOutputFormat(classOf[TableOutputFormat])
-                                                                                                                                                jobConfig.set(TableOutputFormat.OUTPUT_TABLE, tableName)
+    val conf = HBaseConfiguration.create()
+    val jobConfig: JobConf = new JobConf(conf, this.getClass)
+    jobConfig.set("mapreduce.output.fileoutputformat.outputdir", "/user/user01/out")
+    jobConfig.setOutputFormat(classOf[TableOutputFormat])
+    jobConfig.set(TableOutputFormat.OUTPUT_TABLE, tableName)
 
-                                                                                                                                                     /*tweets.foreachRDD{(rdd, time) =>
-                                                                                                                                                            rdd.map(t => {
-                                                                                                                                                                         Map(
-                                                                                                                                                                                      "user"-> t.getUser.getScreenName,
-                                                                                                                                                                                                 "created_at" -> t.getCreatedAt.toInstant.toString,
-                                                                                                                                                                                                            "location" -> Option(t.getGeoLocation).map(geo => { s"${geo.getLatitude},${geo.getLongitude}" }),
-                                                                                                                                                                                                                     "text" -> t.getText,
-                                                                                                                                                                                                                                "hashtags" -> t.getHashtagEntities.map(_.getText),
-                                                                                                                                                                                                                                           "retweet" -> t.getRetweetCount,
-                                                                                                                                                                                                                                                      "language" -> detectLanguage(t.getText),
-                                                                                                                                                                                                                                                                 "sentiment" -> detectSentiment(t.getText).toString
-                                                                                                                                                                                                                                                                          )
-                                                                                                                                                                                                                                                                               }).saveToEs("twitter/tweet")
-                                                                                                                                                                                                                                                                                 }*/
+     /*tweets.foreachRDD{(rdd, time) =>
+       rdd.map(t => {
+         Map(
+           "user"-> t.getUser.getScreenName,
+           "created_at" -> t.getCreatedAt.toInstant.toString,
+           "location" -> Option(t.getGeoLocation).map(geo => { s"${geo.getLatitude},${geo.getLongitude}" }),
+           "text" -> t.getText,
+           "hashtags" -> t.getHashtagEntities.map(_.getText),
+           "retweet" -> t.getRetweetCount,
+           "language" -> detectLanguage(t.getText),
+           "sentiment" -> detectSentiment(t.getText).toString
+         )
+       }).saveToEs("twitter/tweet")
+    }*/
 
-                                                                                                                                                                                                                                                                                     // Write to MapR-DB
-                                                                                                                                                                                                                                                                                          tweets.foreachRDD{(rdd, time) =>
-                                                                                                                                                                                                                                                                                                 rdd.map(t => {
-                                                                                                                                                                                                                                                                                                              var key = t.getUser.getScreenName + "-" + t.getCreatedAt.toInstant.toString
-                                                                                                                                                                                                                                                                                                                       var p = new Put(Bytes.toBytes(key))
+    // Write to MapR-DB
+     tweets.foreachRDD{(rdd, time) =>
+       rdd.map(t => {
+         var key = t.getUser.getScreenName + "-" + t.getCreatedAt.toInstant.toString
+         var p = new Put(Bytes.toBytes(key))
 
-                                                                                                                                                                                                                                                                                                                                  p.add(cfNameBytes, Bytes.toBytes("user"), Bytes.toBytes(t.getUser.getScreenName))
-                                                                                                                                                                                                                                                                                                                                         p.add(cfNameBytes, Bytes.toBytes("created_at"), Bytes.toBytes(t.getCreatedAt.toInstant.toString))
-                                                                                                                                                                                                                                                                                                                                                  p.add(cfNameBytes, Bytes.toBytes("location"), Bytes.toBytes(Option(t.getGeoLocation).map(geo => { s"${geo.getLatitude},${geo.getLongitude}" }).toString))
-                                                                                                                                                                                                                                                                                                                                                         p.add(cfNameBytes, Bytes.toBytes("text"), Bytes.toBytes(t.getText))
-                                                                                                                                                                                                                                                                                                                                                                  p.add(cfNameBytes, Bytes.toBytes("hashtags"), Bytes.toBytes(t.getHashtagEntities.map(_.getText).toString))
-                                                                                                                                                                                                                                                                                                                                                                           p.add(cfNameBytes, Bytes.toBytes("retweet"), Bytes.toBytes(t.getRetweetCount))
-                                                                                                                                                                                                                                                                                                                                                                                    p.add(cfNameBytes, Bytes.toBytes("language"), Bytes.toBytes(detectLanguage(t.getText)))
-                                                                                                                                                                                                                                                                                                                                                                                             p.add(cfNameBytes, Bytes.toBytes("sentiment"), Bytes.toBytes(detectSentiment(t.getText).toString))
-                                                                                                                                                                                                                                                                                                                                                                                                      (new ImmutableBytesWritable, p)
-                                                                                                                                                                                                                                                                                                                                                                                                             }).saveAsHadoopDataset(jobConfig)
-                                                                                                                                                                                                                                                                                                                                                                                                                }
+         p.add(cfNameBytes, Bytes.toBytes("user"), Bytes.toBytes(t.getUser.getScreenName))
+         p.add(cfNameBytes, Bytes.toBytes("created_at"), Bytes.toBytes(t.getCreatedAt.toInstant.toString))
+         p.add(cfNameBytes, Bytes.toBytes("location"), Bytes.toBytes(Option(t.getGeoLocation).map(geo => { s"${geo.getLatitude},${geo.getLongitude}" }).toString))
+         p.add(cfNameBytes, Bytes.toBytes("text"), Bytes.toBytes(t.getText))
+         p.add(cfNameBytes, Bytes.toBytes("hashtags"), Bytes.toBytes(t.getHashtagEntities.map(_.getText).toString))
+         p.add(cfNameBytes, Bytes.toBytes("retweet"), Bytes.toBytes(t.getRetweetCount))
+         p.add(cfNameBytes, Bytes.toBytes("language"), Bytes.toBytes(detectLanguage(t.getText)))
+         p.add(cfNameBytes, Bytes.toBytes("sentiment"), Bytes.toBytes(detectSentiment(t.getText).toString))
+         (new ImmutableBytesWritable, p)
+       }).saveAsHadoopDataset(jobConfig)
+     }
 
-                                                                                                                                                                                                                                                                                                                                                                                                                     ssc.start()
-                                                                                                                                                                                                                                                                                                                                                                                                                          ssc.awaitTermination()
+     ssc.start()
+     ssc.awaitTermination()
 
-                                                                                                                                                                                                                                                                                                                                                                                                                             }
+   }
 
-                                                                                                                                                                                                                                                                                                                                                                                                                               def detectLanguage(text: String) : String = {
+  def detectLanguage(text: String) : String = {
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                     Try {
-                                                                                                                                                                                                                                                                                                                                                                                                                                             val detector = DetectorFactory.create()
-                                                                                                                                                                                                                                                                                                                                                                                                                                                     detector.append(text)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                         detector.detect()
-                                                                                                                                                                                                                                                                                                                                                                                                                                                             }.getOrElse("unknown")
+    Try {
+      val detector = DetectorFactory.create()
+      detector.append(text)
+      detector.detect()
+    }.getOrElse("unknown")
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                               }
+  }
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                }
-
+ }
