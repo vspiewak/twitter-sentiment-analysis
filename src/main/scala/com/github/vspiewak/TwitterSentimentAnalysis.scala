@@ -66,7 +66,7 @@ object TwitterSentimentAnalysis {
     jobConfig.setOutputFormat(classOf[TableOutputFormat])
     jobConfig.set(TableOutputFormat.OUTPUT_TABLE, tableName)
 
-     /*tweets.foreachRDD{(rdd, time) =>
+    tweets.foreachRDD{(rdd, time) =>
        rdd.map(t => {
          Map(
            "user"-> t.getUser.getScreenName,
@@ -79,7 +79,7 @@ object TwitterSentimentAnalysis {
            "sentiment" -> detectSentiment(t.getText).toString
          )
        }).saveToEs("twitter/tweet")
-    }*/
+    }
 
     // Write to MapR-DB
      tweets.foreachRDD{(rdd, time) =>
