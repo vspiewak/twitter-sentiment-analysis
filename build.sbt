@@ -10,7 +10,7 @@ libraryDependencies += "edu.stanford.nlp" % "stanford-corenlp" % "3.5.1"
 
 libraryDependencies += "edu.stanford.nlp" % "stanford-corenlp" % "3.5.1" classifier "models"
 
-libraryDependencies += "org.elasticsearch" % "elasticsearch-spark_2.10" % "2.1.0.Beta3"
+libraryDependencies += "org.elasticsearch" % "elasticsearch-spark_2.10" % "2.2.0-m1" % "compile"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.1" % "test"
 
