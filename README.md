@@ -1,9 +1,11 @@
 Twitter Sentiment Analysis
 ==========================
 
-Retrieve tweets using Spark Streaming,    
-language detection & sentiment analysis (StanfordNLP),    
-live dashboard using Kibana.
+* retrieve tweets using Spark Streaming
+* language detection
+* sentiment analysis (StanfordNLP)   
+* index tweets in Elasticsearch 
+* live dashboard using Kibana
 
 
 Docker setup
