@@ -21,9 +21,9 @@ After installing docker & docker-compose, you can launch the stack with the foll
 
 After a while, Elasticsearch, Kibana, and Spark should be up:
 
+ * http://0.0.0.0:4040/streaming
  * http://0.0.0.0:9200/_plugin/head
  * http://0.0.0.0:5601 
- * http://0.0.0.0:4040 
 
 
 Manual setup
