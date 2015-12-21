@@ -9,6 +9,8 @@ live dashboard using Kibana.
 Docker setup
 ------------
 
+Configure Twitter OAuth in `docker-compose.yml` file.
+
 After installing docker & docker-compose, you can launch the stack with the following commands:
 
     docker-compose build
