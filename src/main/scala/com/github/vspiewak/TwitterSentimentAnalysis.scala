@@ -38,9 +38,10 @@ object TwitterSentimentAnalysis {
      System.setProperty("twitter4j.oauth.accessToken", accessToken)
      System.setProperty("twitter4j.oauth.accessTokenSecret", accessTokenSecret)
 
-     val sparkConf = new SparkConf().setAppName("TwitterSentimentAnalysis")
+     val conf = new SparkConf().setAppName("TwitterSentimentAnalysis")
+     conf.set("es.nodes", conf.get("spark.es.nodes"))
 
-     val ssc = new StreamingContext(sparkConf, Seconds(1))
+     val ssc = new StreamingContext(conf, Seconds(1))
 
      val tweets = TwitterUtils.createStream(ssc, None, filters)
 

@@ -5,7 +5,25 @@ Retrieve tweets using Spark Streaming,
 language detection & sentiment analysis (StanfordNLP),    
 live dashboard using Kibana.
 
-Launch:
+
+Docker setup
+------------
+
+After installing docker & docker-compose, you can launch the stack with the following commands:
+
+    docker-compose build
+    docker-compose up
+
+
+After a while, Elasticsearch, Kibana, and Spark should be up:
+
+ * http://0.0.0.0:9200/_plugin/head
+ * http://0.0.0.0:5601 
+ * http://0.0.0.0:4040 
+
+
+Manual setup
+------------
 
     curl -O http://d3kbcqa49mib13.cloudfront.net/spark-1.5.2.tgz
     tar xvzf spark-1.5.2.tgz
