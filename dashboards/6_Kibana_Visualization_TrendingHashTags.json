@@ -1,0 +1,15 @@
+[
+  {
+    "_id": "Trending-HashTags",
+    "_type": "visualization",
+    "_source": {
+      "title": "Trending HashTags",
+      "visState": "{\"type\":\"pie\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"isDonut\":false},\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"hashtags\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"custom\",\"orderAgg\":{\"id\":\"2-orderAgg\",\"type\":\"count\",\"schema\":\"orderAgg\",\"params\":{}}}},{\"id\":\"3\",\"type\":\"terms\",\"schema\":\"segment\",\"params\":{\"field\":\"sentiment\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
+      "description": "",
+      "version": 1,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"twitter\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      }
+    }
+  }
+]
